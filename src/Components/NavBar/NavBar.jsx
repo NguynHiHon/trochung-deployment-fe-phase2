@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
   AppBar,
   Toolbar,
-  Typography,
   Button,
   Menu,
   MenuItem,

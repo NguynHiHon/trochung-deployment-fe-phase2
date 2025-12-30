@@ -8,23 +8,19 @@ import {
   Stack,
   Rating,
   Avatar,
-  Button,
-  TextField,
-  Divider,
+  
   Card,
   CardContent,
   Grid,
-  Chip,
+  
   IconButton
 } from '@mui/material';
 import {
   ArrowBack,
   Star,
-  StarBorder,
-  Send,
+ 
   ThumbUp,
   ThumbUpOutlined,
-  CloudUpload,
   Close
 } from '@mui/icons-material';
 import { CommentApi } from '../../services/api/commentApi';
@@ -47,63 +43,7 @@ const RoomReviewsPage = () => {
   const [selectedImage, setSelectedImage] = useState(null);
 
   // Sample reviews data
-  const sampleReviews = [
-    {
-      id: 1,
-      name: 'Phương Anh 2k4',
-      avatar: 'PA',
-      rating: 5,
-      comment: 'Mình ở đây từ năm 1, chưa có vấn đề gì xảy ra, chỉ có mỗi hơi xa chợ, chú trọ oke',
-      date: '26/07 09:36 AM',
-      likes: 12,
-      liked: false,
-      media: []
-    },
-    {
-      id: 2,
-      name: 'Tuấn Anh 27k7',
-      avatar: 'TA',
-      rating: 5,
-      comment: 'Vừa mới vào ở lần đầu, chưa biết vấn đề gì ko nhưng chủ nhà vui tính nên okela',
-      date: 'Hôm nay 09:36 AM',
-      likes: 8,
-      liked: true,
-      media: []
-    },
-    {
-      id: 3,
-      name: 'Minh Hoàng',
-      avatar: 'MH',
-      rating: 4,
-      comment: 'Phòng đẹp, giá hợp lý. Chủ nhà nhiệt tình hỗ trợ. Chỉ có điều hơi ồn vào cuối tuần.',
-      date: '25/07 14:20 PM',
-      likes: 15,
-      liked: false,
-      media: []
-    },
-    {
-      id: 4,
-      name: 'Ngọc Linh',
-      avatar: 'NL',
-      rating: 5,
-      comment: 'Rất hài lòng với phòng này. Nội thất đầy đủ, vị trí thuận tiện, giá cả phải chăng.',
-      date: '24/07 10:15 AM',
-      likes: 20,
-      liked: true,
-      media: []
-    },
-    {
-      id: 5,
-      name: 'Đức Minh',
-      avatar: 'DM',
-      rating: 3,
-      comment: 'Phòng ổn nhưng hơi nhỏ. Chủ nhà ok nhưng thang máy hay hỏng.',
-      date: '23/07 16:45 PM',
-      likes: 5,
-      liked: false,
-      media: []
-    }
-  ];
+ 
 
   useEffect(() => {
     const loadData = async () => {

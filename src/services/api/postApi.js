@@ -103,6 +103,27 @@ export const fetchAllRooms = async () => {
     }
 };
 
+// Fetch rooms with server-side pagination and filters
+export const fetchRooms = async ({ page = 1, limit = 12, search = '', minPrice, maxPrice, minArea, maxArea, city, district, types, sort } = {}) => {
+    const params = { page, limit };
+    if (search) params.search = search;
+    if (minPrice !== undefined) params.minPrice = minPrice;
+    if (maxPrice !== undefined) params.maxPrice = maxPrice;
+    if (minArea !== undefined) params.minArea = minArea;
+    if (maxArea !== undefined) params.maxArea = maxArea;
+    if (city) params.city = city;
+    if (district) params.district = district;
+    if (types) params.types = Array.isArray(types) ? types.join(',') : types;
+    if (sort) params.sort = sort;
+    try {
+        const res = await axios.get('/api/posts/rooms', { params });
+        return res.data || { success: false, rooms: [], total: 0 };
+    } catch (error) {
+        console.error('fetchRooms error:', error);
+        return { success: false, rooms: [], total: 0 };
+    }
+};
+
 // Lấy chi tiết phòng trọ theo ID từ database
 export const fetchRoomById = async (id) => {
     try {
@@ -346,7 +367,7 @@ export const deletePostAction = async (postId, dispatch) => {
     }
 
 
-    
+
 };
 export const fetchHomeData = async () => {
     try {

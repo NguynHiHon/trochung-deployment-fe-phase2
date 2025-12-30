@@ -15,12 +15,49 @@ import {
 } from 'redux-persist';
 
 import storage from 'redux-persist/lib/storage';
+import { createTransform } from 'redux-persist';
 
 const persistConfig = {
     key: 'root',
     version: 1,
     storage,
-    whitelist: ['auth'], // Chỉ persist auth
+    whitelist: ['auth'], // Chỉ persist auth (but we will strip sensitive fields)
+    transforms: [
+        // Strip accessToken before writing to storage and ensure rehydrated token is empty
+        createTransform(
+            // inbound: state -> persisted
+            (inboundState, key) => {
+                if (!inboundState) return inboundState;
+                const next = { ...inboundState };
+                if (next.login) {
+                    return {
+                        ...next,
+                        login: {
+                            ...next.login,
+                            accessToken: '',
+                        },
+                    };
+                }
+                return next;
+            },
+            // outbound: state -> rehydrated
+            (outboundState, key) => {
+                if (!outboundState) return outboundState;
+                const next = { ...outboundState };
+                if (next.login) {
+                    return {
+                        ...next,
+                        login: {
+                            ...next.login,
+                            accessToken: '',
+                        },
+                    };
+                }
+                return next;
+            },
+            { whitelist: ['auth'] }
+        ),
+    ],
 };
 const rootReducer = combineReducers({
     auth: authReducer,

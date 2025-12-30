@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Box, Typography, Paper, Grid, Chip, Stack, Pagination, Button, Slider, List, ListItemButton, ListItemText, TextField, InputAdornment, ToggleButtonGroup, ToggleButton, Menu, MenuItem, Checkbox, FormControlLabel, IconButton, Tooltip } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';

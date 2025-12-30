@@ -10,7 +10,7 @@ const axiosJWT = axios.create({
   withCredentials: true
 });
 
-// Hàm refresh access token khi token hết hạn
+// Hàm refresh access token khi token hết hạn hoặc đã reload trang không còn token trong memory
 const refreshAccessToken = async () => {
   try {
     // Gọi API refresh token với cookie chứa refresh token
@@ -31,7 +31,7 @@ axiosJWT.interceptors.request.use(async (config) => {
   const state = store.getState();
   const accessToken = state?.auth?.login?.accessToken || "";
   const currentUser = state?.auth?.login?.currentUser || null;
-  
+
   // Kiểm tra xem có access token không
   if (accessToken) {
     try {
@@ -43,15 +43,15 @@ axiosJWT.interceptors.request.use(async (config) => {
       // Nếu token đã hết hạn thì refresh
       if (isExpired) {
         const data = await refreshAccessToken();
-        
+
         if (data) {
           // Cập nhật Redux store với token mới
-          const refreshUser = { 
+          const refreshUser = {
             user: currentUser,
             accessToken: data.accessToken
           };
           store.dispatch(loginSuccess(refreshUser));
-          
+
           // Sử dụng token mới cho request này
           config.headers["token"] = `Bearer ${data.accessToken}`;
         } else {
@@ -67,8 +67,27 @@ axiosJWT.interceptors.request.use(async (config) => {
       config.headers["token"] = `Bearer ${accessToken}`;
     }
   }
+  else {
+    const data = await refreshAccessToken();
+
+    if (data) {
+      // Cập nhật Redux store với token mới
+      const refreshUser = {
+        user: currentUser,
+        accessToken: data.accessToken
+      };
+      store.dispatch(loginSuccess(refreshUser));
+
+      // Sử dụng token mới cho request này
+      config.headers["token"] = `Bearer ${data.accessToken}`;
+    } else {
+      // Nếu refresh thất bại thì hủy request
+      return Promise.reject(new Error('AUTH_FAILED'));
+    }
+
+  }
   // Không có token thì để trống, backend sẽ trả về 401
-  
+
   return config;
 }, (error) => {
   return Promise.reject(error);

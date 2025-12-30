@@ -11,7 +11,7 @@ import secureImg from "../../assets/anh_login.jpg"; // thay bằng ảnh bạn g
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // 👁️ trạng thái ẩn/hiện
+  const [showPassword, setShowPassword] = useState(false); //  trạng thái ẩn/hiện
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

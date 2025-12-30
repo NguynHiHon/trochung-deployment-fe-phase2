@@ -41,10 +41,10 @@ describe('UserSidebar', () => {
     renderWithStore(<UserSidebar />);
 
     // wallet chip should show computed balance 80000
-    await waitFor(() => expect(screen.getByText(/Số dư:/i)).toBeInTheDocument());
+    await screen.findByText(/Số dư:/i);
     expect(screen.getByText(/80,000/)).toBeInTheDocument();
 
     // islandor badge should appear (text like '5h' or 'Đang hoạt động')
-    await waitFor(() => expect(screen.getByText(/Đang hoạt động|h|m/)).toBeInTheDocument());
+    await screen.findByText(/Đang hoạt động|h|m/);
   });
 });

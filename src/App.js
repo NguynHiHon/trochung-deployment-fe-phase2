@@ -1,5 +1,5 @@
 import "./App.css";
-import './config/axios'; 
+import './config/axios';
 import HomeAdmin from "./pages/AdminLayout/HomeAdmin/HomeAdmin";
 import HomePageUser from "./pages/HomePageUser/HomePageUser";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
@@ -41,7 +41,6 @@ import FavoritesPage from "./pages/FavoritesPage/FavoritesPage";
 import RoomDetailPage from "./pages/RoomDetailPage/RoomDetailPage";
 import RoomReviewsPage from "./pages/RoomReviewsPage/RoomReviewsPage";
 import Footer from "./Components/Footer/Footer";
-import CloudinaryTest from './pages/CloudinaryTest/CloudinaryTest';
 import PostRoomPages from "./pages/UserLayout/PostRoomPages";
 import ManagePostUser from './pages/UserLayout/ManagePostUser';
 import { ToastProvider } from "./Components/ToastProvider";
@@ -73,7 +72,7 @@ function AppContent() {
           <Route path="/login" element={<LoginPage />} />
           {/* <Route path="/register" element={<RegisterPage />} /> */}
           <Route path="/register" element={<Register />} />
-          <Route path="/verify" element={<Verify />} /> 
+          <Route path="/verify" element={<Verify />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/verifycode" element={<VerifyCode />} />
           <Route path="/reset-password" element={<ResetPassword />} />
@@ -100,7 +99,7 @@ function AppContent() {
             <Route path="confirm-payment" element={<AdminPayments />} />
             <Route path="viewsupport" element={<AdminSupport />} />
           </Route>
-          
+
           {/* User routes */}
 
           <Route path="/user" element={<UserLayout />}>
@@ -115,9 +114,8 @@ function AppContent() {
             <Route path="posts/edit/:postId" element={<PostEdit />} />
             <Route path="post-room" element={<PostRoomPages />} />
             <Route path="support" element={<SupportPage />} />
-            <Route path="invite-roommate" element={<InviteroomatePages/>} />
+            <Route path="invite-roommate" element={<InviteroomatePages />} />
           </Route>
-          <Route path="/cloudinary-test" element={<CloudinaryTest />} />
 
         </Routes>
       </Box>

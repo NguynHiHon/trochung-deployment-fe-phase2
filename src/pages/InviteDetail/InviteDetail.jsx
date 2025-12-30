@@ -12,13 +12,10 @@ import {
   Button,
   IconButton,
   Tooltip,
-  Divider,
   Card,
-  CardMedia,
   CardContent,
   Avatar,
   Rating as MuiRating,
-  Badge
 } from '@mui/material';
 import {
   ArrowBack,
@@ -27,19 +24,9 @@ import {
   Share,
   Phone,
   LocationOn,
-  Home,
-  People,
-  Wc,
-  SquareFoot,
-  CalendarToday,
-  Person,
-  Star,
+
   PlayArrow,
-  Kitchen,
-  DirectionsCar,
-  Build,
-  CheckCircle,
-  Map,
+ 
   Message,
   Save,
   ExpandLess,
