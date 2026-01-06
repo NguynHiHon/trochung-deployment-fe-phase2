@@ -13,20 +13,15 @@ const SimilarRooms = ({
   const navigate = useNavigate();
 
   const handleToggleFavorite = async (roomId) => {
-    if (!accessToken) { 
-      showToast('Vui lòng đăng nhập để yêu thích phòng trọ', 'warning');
-      return; 
-    }
     const newFavorites = new Set(favorites);
     if (newFavorites.has(roomId)) {
       newFavorites.delete(roomId);
-      try { await FavoriteApi.removeFavorite(roomId); } catch (_) {}
+      if (accessToken) { try { await FavoriteApi.removeFavorite(roomId); } catch (_) {} }
     } else {
       newFavorites.add(roomId);
-      try { await FavoriteApi.addFavorite(roomId); } catch (_) {}
+      if (accessToken) { try { await FavoriteApi.addFavorite(roomId); } catch (_) {} }
     }
     setFavorites(newFavorites);
-    localStorage.setItem('favoriteRoomIds', JSON.stringify([...newFavorites]));
     try { window.dispatchEvent(new Event('favoritesUpdated')); } catch (_) {}
   };
 

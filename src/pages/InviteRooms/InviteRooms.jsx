@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { FavoriteApi } from '../../services/api';
 import { fetchAllRooms, fetchPostByRoom } from '../../services/api/postApi';
 import { Box, Typography, Chip, Grid, Stack, Slider, Button, Checkbox, FormControlLabel, Paper, List, ListItemButton, ListItemText, Pagination, TextField, InputAdornment, ToggleButton, ToggleButtonGroup, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Tooltip } from '@mui/material';
@@ -149,41 +150,40 @@ const InviteRooms = () => {
     setPage(1);
   };
 
-  // Favorites (localStorage persistence)
+  // Favorites (in-memory for anonymous users). Backend calls only if user is authenticated.
+  const accessToken = useSelector((st) => st?.auth?.login?.accessToken);
+
   const [favorites, setFavorites] = useState(new Set());
 
-  // Load favorites from backend on mount
+  // Load favorites from backend when authenticated
   useEffect(() => {
     (async () => {
       try {
+        if (!accessToken) {
+          setFavorites(new Set());
+          return;
+        }
         const res = await FavoriteApi.getMyFavorites();
         const ids = (res?.favorites || []).map(f => String(f.room?._id || f.clientRoomId || f.room));
         setFavorites(new Set(ids));
-        localStorage.setItem('favoriteRoomIds', JSON.stringify(ids));
       } catch (_) {}
     })();
-  }, []);
-
-  const saveFavorites = (setObj) => {
-    const arr = Array.from(setObj);
-    localStorage.setItem('favoriteRoomIds', JSON.stringify(arr));
-  };
+  }, [accessToken]);
 
   const toggleFavorite = (id) => {
     setFavorites((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
         next.delete(id);
-        FavoriteApi.removeFavorite(id).catch(() => {});
+        if (accessToken) FavoriteApi.removeFavorite(id).catch(() => {});
       } else {
         if (next.size >= MAX_FAVORITES) {
           try { alert(`Bạn chỉ có thể lưu tối đa ${MAX_FAVORITES} phòng yêu thích.`); } catch (_) {}
           return prev;
         }
         next.add(id);
-        FavoriteApi.addFavorite(id).catch(() => {});
+        if (accessToken) FavoriteApi.addFavorite(id).catch(() => {});
       }
-      saveFavorites(next);
       try { window.dispatchEvent(new Event('favoritesUpdated')); } catch (_) {}
       return next;
     });

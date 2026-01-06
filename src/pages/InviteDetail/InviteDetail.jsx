@@ -58,10 +58,18 @@ const InviteDetail = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Load favorites
-        const savedFavorites = localStorage.getItem('favoriteRoomIds');
-        if (savedFavorites) {
-          try { setFavorites(new Set(JSON.parse(savedFavorites))); } catch (e) { console.error('Error parsing favorites', e); }
+        // Load favorites: if logged in -> load from backend, otherwise keep empty in-memory set
+        if (accessToken) {
+          try {
+            const resFav = await FavoriteApi.getMyFavorites();
+            const ids = (resFav?.favorites || []).map(f => String(f.room?._id || f.clientRoomId || f.room));
+            setFavorites(new Set(ids));
+          } catch (err) {
+            console.error('Error loading favorites from backend:', err);
+            setFavorites(new Set());
+          }
+        } else {
+          setFavorites(new Set());
         }
 
         // Fetch post (post detail should populate userInfo and room)
@@ -130,11 +138,10 @@ const InviteDetail = () => {
         const postId = p._id || p.id || foundRoom.postId;
         if (postId) {
           try {
-            const [cmt, stats, mine] = await Promise.all([
-              CommentApi.listByPost(postId).catch(() => []),
-              RatingApi.stats(postId).catch(() => ({ average: 0, count: 0 })),
-              RatingApi.me(postId).catch(() => null)
-            ]);
+            const cmtPromise = CommentApi.listByPost(postId).catch(() => []);
+            const statsPromise = RatingApi.stats(postId).catch(() => ({ average: 0, count: 0 }));
+            const minePromise = accessToken ? RatingApi.me(postId).catch(() => null) : Promise.resolve(null);
+            const [cmt, stats, mine] = await Promise.all([cmtPromise, statsPromise, minePromise]);
             setComments(Array.isArray(cmt) ? cmt : []);
             setRatingStats(stats || { average: 0, count: 0 });
             setMyRating(mine || null);
@@ -174,15 +181,29 @@ const InviteDetail = () => {
     const newFavorites = new Set(favorites);
     if (newFavorites.has(key)) {
       newFavorites.delete(key);
-      try { await FavoriteApi.removeFavorite(key); } catch (_) {}
+      if (accessToken) { try { await FavoriteApi.removeFavorite(key); } catch (_) {} }
     } else {
       if (newFavorites.size >= MAX_FAVORITES) { try { alert(`Bạn chỉ có thể lưu tối đa ${MAX_FAVORITES} phòng yêu thích.`); } catch (_) {} return; }
       newFavorites.add(key);
-      try { await FavoriteApi.addFavorite(key); } catch (_) {}
+      if (accessToken) { try { await FavoriteApi.addFavorite(key); } catch (_) {} }
     }
     setFavorites(newFavorites);
-    localStorage.setItem('favoriteRoomIds', JSON.stringify([...newFavorites]));
     window.dispatchEvent(new Event('favoritesUpdated'));
+  };
+
+  const handleToggleFavorite = async (roomId) => {
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      if (next.has(roomId)) {
+        next.delete(roomId);
+        if (accessToken) FavoriteApi.removeFavorite(roomId).catch(() => {});
+      } else {
+        next.add(roomId);
+        if (accessToken) FavoriteApi.addFavorite(roomId).catch(() => {});
+      }
+      try { window.dispatchEvent(new Event('favoritesUpdated')); } catch (err) { console.error(err); }
+      return next;
+    });
   };
 
   const handleBack = () => navigate(-1);
@@ -416,7 +437,7 @@ const InviteDetail = () => {
                     <Box sx={{ position: 'relative', height: 160 }}>
                       <Box component="img" src={similarRoom.image} alt={similarRoom.title} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       <Chip label="Đã Xác Thực" size="small" sx={{ position: 'absolute', top: 8, left: 8, bgcolor: 'success.main', color: 'white' }} />
-                      <IconButton size="small" onClick={() => { const newFavorites = new Set(favorites); if (newFavorites.has(similarRoom.id)) newFavorites.delete(similarRoom.id); else newFavorites.add(similarRoom.id); setFavorites(newFavorites); localStorage.setItem('favoriteRoomIds', JSON.stringify([...newFavorites])); window.dispatchEvent(new Event('favoritesUpdated')); }} sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'rgba(255,255,255,0.9)' }}>{favorites.has(similarRoom.id) ? <Favorite color="error" fontSize="small"/> : <FavoriteBorder fontSize="small"/>}</IconButton>
+                      <IconButton size="small" onClick={() => handleToggleFavorite(similarRoom.id)} sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'rgba(255,255,255,0.9)' }}>{favorites.has(similarRoom.id) ? <Favorite color="error" fontSize="small"/> : <FavoriteBorder fontSize="small"/>}</IconButton>
                     </Box>
                     <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', p: 1.5 }}>
                       <Box>

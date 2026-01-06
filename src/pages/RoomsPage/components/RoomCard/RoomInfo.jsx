@@ -1,87 +1,166 @@
 import React from 'react';
-import { Box, Typography, Stack, Button } from '@mui/material';
+import { Box, Typography, Stack, Chip, Avatar, Rating } from '@mui/material';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import AspectRatioIcon from '@mui/icons-material/AspectRatio';
+import BedIcon from '@mui/icons-material/Bed';
+import BathtubIcon from '@mui/icons-material/Bathtub';
 
-const RoomInfo = ({ room, handleViewDetails }) => {
+const RoomInfo = ({ room }) => {
+  // Format price with dots as thousand separators
+  const formatPrice = (price) => {
+    if (!price) return '0';
+    // Remove non-numeric characters
+    const numericPrice = String(price).replace(/[^\d]/g, '');
+    // Add dots every 3 digits from right
+    return numericPrice.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };
+
   return (
     <Box
       sx={{
         display: 'flex',
-        justifyContent: 'space-between',
-        gap: 2,
+        flexDirection: 'column',
+        gap: 1.5,
         height: '100%',
-        alignSelf: 'stretch',
-        flexDirection: 'column'
+        pl: { xs: 0, sm: 2 },
+        minWidth: 0
       }}
     >
-      <Box sx={{ flex: 1, pl: { xs: 0, sm: 1 }, minWidth: 0 }}>
-        <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.4, fontSize: { md: 16, lg: 16 } }}>
-          {room.title}
-        </Typography>
-        <Stack direction="row" spacing={1.4} sx={{ mb: 0.5, flexWrap: 'wrap' }}>
-          <Typography variant="body2" color="error.main" sx={{ fontWeight: 700 }}>
-            {room.price} {room.unit}
-          </Typography>
-          <Typography variant="body2">{room.area} m²</Typography>
-          <Typography variant="body2">{room.beds || 0}pn</Typography>
-          <Typography variant="body2">{room.baths || 0}wc</Typography>
-        </Stack>
-        <Stack direction="row" spacing={0.8} sx={{ mb: 0.5, flexWrap: 'wrap' }}>
-          <Typography variant="body2" color="text.secondary">
-            {room.district}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            ,
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {room.city}
-          </Typography>
-        </Stack>
-        <Stack
-          direction="row"
-          spacing={1}
-          sx={{ mt: { xs: 1, sm: 'auto' }, alignItems: 'center', flexWrap: 'wrap' }}
+      {/* Author - Moved to top like Facebook/Instagram post */}
+      <Stack 
+        direction="row" 
+        spacing={1.5} 
+        alignItems="center"
+        sx={{ mb: 0.5 }}
+      >
+        <Avatar
+          src={room.authorAvatar}
+          sx={{
+            width: 40,
+            height: 40,
+            bgcolor: 'primary.main',
+            fontSize: 16,
+            fontWeight: 600
+          }}
         >
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => handleViewDetails(room.id)}
+          {room.author?.charAt(0).toUpperCase() || 'N'}
+        </Avatar>
+        <Box>
+          <Typography variant="body2" sx={{ fontWeight: 600, fontSize: 14, lineHeight: 1.2 }}>
+            {room.author}
+          </Typography>
+          <Typography variant="caption" color="text.secondary" sx={{ fontSize: 12 }}>
+            Người cho thuê
+          </Typography>
+        </Box>
+      </Stack>
+
+      {/* Title */}
+      <Typography 
+        variant="h6" 
+        sx={{ 
+          fontWeight: 600, 
+          fontSize: { xs: 16, md: 17 },
+          lineHeight: 1.4,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical'
+        }}
+      >
+        {room.title}
+      </Typography>
+
+      {/* Price */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            fontWeight: 700,
+            color: '#d32f2f',
+            fontSize: { xs: 16, md: 17 }
+          }}
+        >
+          {formatPrice(room.price)} VND/tháng
+        </Typography>
+        <Stack direction="row" spacing={0.5} alignItems="center">
+          <Rating 
+            value={room.rating || 0} 
+            precision={0.5} 
+            size="small" 
+            readOnly
             sx={{
-              ml: { xs: 0, sm: 'auto' },
-              textTransform: 'none',
-              fontSize: '12px',
-              minWidth: 'auto',
-              px: 2,
-              width: { xs: '100%', sm: 'auto' },
-              display: { xs: 'block', sm: 'inline-block' }
+              '& .MuiRating-iconFilled': {
+                color: '#ffa500'
+              },
+              '& .MuiRating-iconEmpty': {
+                color: 'rgba(0, 0, 0, 0.12)'
+              }
             }}
-          >
-            Xem chi tiết
-          </Button>
-          <Box sx={{ flexGrow: 1 }} />
-          {/* Người đăng */}
-          <Stack direction="row" spacing={0.6} sx={{ alignItems: 'center' }}>
-            <Box
-              sx={{
-                width: 24,
-                height: 24,
-                bgcolor: '#ff6f00',
-                color: 'white',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 12
-              }}
-            >
-              {room.author?.charAt(0) || 'N'}
-            </Box>
-            <Typography variant="caption" color="text.secondary">
-              {room.author}
-            </Typography>
-          </Stack>
+          />
+          <Typography variant="body2" sx={{ fontWeight: 600, fontSize: 13, ml: 0.5 }}>
+            {room.rating || 0}
+          </Typography>
+          <Typography variant="caption" color="text.secondary" sx={{ fontSize: 12 }}>
+            ({room.totalRatings || 0})
+          </Typography>
         </Stack>
       </Box>
-      <Box sx={{ minWidth: 130, textAlign: 'right' }}>{/* Reserved space */}</Box>
+
+      {/* Details - Softer styling */}
+      <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 0.8 }}>
+        <Chip
+          icon={<AspectRatioIcon sx={{ fontSize: 15, opacity: 0.8 }} />}
+          label={`${room.area} m²`}
+          size="small"
+          sx={{ 
+            height: 28,
+            bgcolor: 'rgba(0, 177, 79, 0.08)',
+            border: 'none',
+            fontWeight: 500,
+            color: 'text.primary',
+            '& .MuiChip-label': { px: 1.2, fontSize: 12.5 },
+            '& .MuiChip-icon': { ml: 0.8, color: '#00b14f' }
+          }}
+        />
+        <Chip
+          icon={<BedIcon sx={{ fontSize: 15, opacity: 0.8 }} />}
+          label={`${room.beds || 0} PN`}
+          size="small"
+          sx={{ 
+            height: 28,
+            bgcolor: 'rgba(25, 118, 210, 0.08)',
+            border: 'none',
+            fontWeight: 500,
+            color: 'text.primary',
+            '& .MuiChip-label': { px: 1.2, fontSize: 12.5 },
+            '& .MuiChip-icon': { ml: 0.8, color: '#1976d2' }
+          }}
+        />
+        <Chip
+          icon={<BathtubIcon sx={{ fontSize: 15, opacity: 0.8 }} />}
+          label={`${room.baths || 0} WC`}
+          size="small"
+          sx={{ 
+            height: 28,
+            bgcolor: 'rgba(211, 47, 47, 0.08)',
+            border: 'none',
+            fontWeight: 500,
+            color: 'text.primary',
+            '& .MuiChip-label': { px: 1.2, fontSize: 12.5 },
+            '& .MuiChip-icon': { ml: 0.8, color: '#d32f2f' }
+          }}
+        />
+      </Stack>
+
+      {/* Location */}
+      <Stack direction="row" spacing={0.8} alignItems="center" sx={{ mt: 'auto' }}>
+        <LocationOnIcon sx={{ fontSize: 16, color: 'text.secondary', opacity: 0.7 }} />
+        <Typography variant="body2" color="text.secondary" sx={{ fontSize: 13 }}>
+          {room.district}, {room.city}
+        </Typography>
+      </Stack>
     </Box>
   );
 };

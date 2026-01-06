@@ -3,6 +3,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/
 import CategoryFilter from './CategoryFilter';
 import LocationFilter from './LocationFilter';
 import PriceRangeFilter from './PriceRangeFilter';
+import AreaRangeFilter from './AreaRangeFilter';
 import FeatureFilter from './FeatureFilter';
 
 const FilterDialog = ({
@@ -12,23 +13,40 @@ const FilterDialog = ({
   setSelectedCategory,
   selectedProvince,
   setSelectedProvince,
+  selectedProvinceCode,
+  setSelectedProvinceCode,
   selectedDistrict,
   setSelectedDistrict,
+  selectedDistrictCode,
+  setSelectedDistrictCode,
   selectedWard,
   setSelectedWard,
+  selectedWardCode,
+  setSelectedWardCode,
   provinceEl,
   setProvinceEl,
   districtEl,
   setDistrictEl,
   wardEl,
   setWardEl,
-  provinceOptions,
-  districtOptions,
-  wardOptions,
+  provinces,
+  districts,
+  wards,
+  loadingDistricts,
+  loadingWards,
+  handleProvinceSelect,
+  handleDistrictSelect,
+  handleWardSelect,
   selectedPriceKey,
   setSelectedPriceKey,
   draftPrice,
   setDraftPrice,
+  selectedAreaKey,
+  setSelectedAreaKey,
+  draftArea,
+  setDraftArea,
+  draftUtilities,
+  toggleUtility,
   selectedFeatures,
   setSelectedFeatures,
   clearAllFilters,
@@ -50,20 +68,32 @@ const FilterDialog = ({
         />
         <LocationFilter
           selectedProvince={selectedProvince}
+          selectedProvinceCode={selectedProvinceCode}
           setSelectedProvince={setSelectedProvince}
+          setSelectedProvinceCode={setSelectedProvinceCode}
           selectedDistrict={selectedDistrict}
+          selectedDistrictCode={selectedDistrictCode}
           setSelectedDistrict={setSelectedDistrict}
+          setSelectedDistrictCode={setSelectedDistrictCode}
           selectedWard={selectedWard}
+          selectedWardCode={selectedWardCode}
           setSelectedWard={setSelectedWard}
+          setSelectedWardCode={setSelectedWardCode}
           provinceEl={provinceEl}
           setProvinceEl={setProvinceEl}
           districtEl={districtEl}
           setDistrictEl={setDistrictEl}
           wardEl={wardEl}
           setWardEl={setWardEl}
-          provinceOptions={provinceOptions}
-          districtOptions={districtOptions}
-          wardOptions={wardOptions}
+          provinces={provinces}
+          districts={districts}
+          wards={wards}
+          loadingDistricts={loadingDistricts}
+          loadingWards={loadingWards}
+          handleProvinceSelect={handleProvinceSelect}
+          handleDistrictSelect={handleDistrictSelect}
+          handleWardSelect={handleWardSelect}
+          isFromDialog={true}
         />
         <PriceRangeFilter
           selectedPriceKey={selectedPriceKey}
@@ -71,7 +101,15 @@ const FilterDialog = ({
           draftPrice={draftPrice}
           setDraftPrice={setDraftPrice}
         />
+        <AreaRangeFilter
+          selectedAreaKey={selectedAreaKey}
+          setSelectedAreaKey={setSelectedAreaKey}
+          draftArea={draftArea}
+          setDraftArea={setDraftArea}
+        />
         <FeatureFilter
+          draftUtilities={draftUtilities}
+          toggleUtility={toggleUtility}
           selectedFeatures={selectedFeatures}
           setSelectedFeatures={setSelectedFeatures}
         />

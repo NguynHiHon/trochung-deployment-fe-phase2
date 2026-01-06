@@ -15,7 +15,11 @@ const BasicInfoSection = ({
     selectedPrice, 
     setSelectedPrice,
     selectedArea,
-    setSelectedArea
+    setSelectedArea,
+    selectedBeds,
+    setSelectedBeds,
+    selectedBaths,
+    setSelectedBaths
 }) => {
     return (
         <>
@@ -106,6 +110,50 @@ const BasicInfoSection = ({
                             onChange={(e) => {
                                 const v = e.target.value === '' ? '' : Number(e.target.value);
                                 setSelectedArea(v);
+                            }}
+                            sx={{ bgcolor: '#fff' }}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 4, md: 3, lg: 3 }}>
+                        <Typography
+                            variant="body2"
+                            mb={0.5}
+                            sx={{ textAlign: 'left' }}
+                        >
+                            Số phòng ngủ
+                        </Typography>
+                        <TextField
+                            fullWidth
+                            size="small"
+                            type="number"
+                            inputProps={{ min: 0, step: 1 }}
+                            value={selectedBeds === undefined || selectedBeds === null ? '' : selectedBeds}
+                            placeholder="Số phòng ngủ"
+                            onChange={(e) => {
+                                const v = e.target.value === '' ? 0 : Number(e.target.value);
+                                setSelectedBeds(v);
+                            }}
+                            sx={{ bgcolor: '#fff' }}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 4, md: 3, lg: 3 }}>
+                        <Typography
+                            variant="body2"
+                            mb={0.5}
+                            sx={{ textAlign: 'left' }}
+                        >
+                            Số phòng WC
+                        </Typography>
+                        <TextField
+                            fullWidth
+                            size="small"
+                            type="number"
+                            inputProps={{ min: 0, step: 1 }}
+                            value={selectedBaths === undefined || selectedBaths === null ? '' : selectedBaths}
+                            placeholder="Số phòng WC"
+                            onChange={(e) => {
+                                const v = e.target.value === '' ? 0 : Number(e.target.value);
+                                setSelectedBaths(v);
                             }}
                             sx={{ bgcolor: '#fff' }}
                         />

@@ -14,10 +14,9 @@ export const CATEGORY_OPTIONS = [
 export const ROOM_TYPES = [
     'Phòng trọ',
     'Căn hộ mini',
-    'Nhà nguyên căn',
-    'Ở ghép',
+    'Nhà riêng',
     'Studio',
-    'Căn hộ 1PN'
+    'Chung cư',
 ];
 
 export const PRICE_PRESETS = [
@@ -34,22 +33,23 @@ export const PRICE_PRESETS = [
 
 export const FEATURE_OPTIONS = [
     'Đầy đủ nội thất',
-    'Có gác',
+    'Gác xếp',
     'Kệ bếp',
-    'Có máy lạnh',
-    'Có máy giặt',
-    'Có tủ lạnh',
-    'Có thang máy',
+    'Máy lạnh',
+    'Máy giặt',
+    'Tủ lạnh',
+    'Thang máy',
     'Không chung chủ',
     'Giờ giấc tự do',
-    'Có bảo vệ 24/24',
-    'Có hầm để xe'
+    'Bảo vệ 24/24',
+    'Hầm để xe'
 ];
 
 export const DEFAULT_FILTERS = {
     price: [0, 20], // đơn vị: triệu VND/tháng
     area: [0, 150], // m2
     types: [],
+    utilities: [], // danh sách tiện ích/nội thất
     trusts: { vip: false, verified: false, normal: true }
 };
 

@@ -39,14 +39,18 @@ const RoomDetailPage = () => {
       try {
         console.log('RoomDetailPage - Loading room with ID:', id);
         
-        // Load favorites from localStorage
-        const savedFavorites = localStorage.getItem('favoriteRoomIds');
-        if (savedFavorites) {
+        // Favorites: do NOT read/write localStorage. If authenticated, load favorites from backend; otherwise keep empty in-memory.
+        if (accessToken) {
           try {
-            setFavorites(new Set(JSON.parse(savedFavorites)));
-          } catch (e) {
-            console.error('Error parsing favorites:', e);
+            const resFav = await FavoriteApi.getMyFavorites();
+            const ids = (resFav?.favorites || []).map(f => String(f.room?._id || f.clientRoomId || f.room));
+            setFavorites(new Set(ids));
+          } catch (err) {
+            console.error('Error loading favorites in RoomDetailPage:', err);
+            setFavorites(new Set());
           }
+        } else {
+          setFavorites(new Set());
         }
 
         // Fetch room details from API
@@ -63,11 +67,10 @@ const RoomDetailPage = () => {
             // Load comments & ratings từ server nếu có postId hợp lệ
             if (postId) {
               console.log('📡 Loading comments and ratings...');
-              const [cmt, stats, mine] = await Promise.all([
-                CommentApi.listByPost(postId).catch(e => { console.error('Comments error:', e); return []; }),
-                RatingApi.stats(postId).catch(e => { console.error('Stats error:', e); return { average: 0, count: 0 }; }),
-                RatingApi.me(postId).catch(e => { console.log('Me rating error (OK if not logged in):', e.message); return null; })
-              ]);
+              const cmtPromise = CommentApi.listByPost(postId).catch(e => { console.error('Comments error:', e); return []; });
+              const statsPromise = RatingApi.stats(postId).catch(e => { console.error('Stats error:', e); return { average: 0, count: 0 }; });
+              const minePromise = accessToken ? RatingApi.me(postId).catch(e => { console.log('Me rating error (OK if not logged in):', e.message); return null; }) : Promise.resolve(null);
+              const [cmt, stats, mine] = await Promise.all([cmtPromise, statsPromise, minePromise]);
               console.log('✅ Comments loaded:', cmt);
               console.log('✅ Stats loaded:', stats);
               console.log('✅ My rating loaded:', mine);
@@ -105,25 +108,21 @@ const RoomDetailPage = () => {
   const toggleFavorite = async () => {
     console.log('❤️ Favorite toggle (header)');
     console.log('🔐 Access token:', accessToken ? 'EXISTS' : 'MISSING');
-    if (!accessToken) {
-      showToast('Vui lòng đăng nhập để yêu thích phòng trọ', 'warning');
-      return;
-    }
+    // If not authenticated, allow in-memory favorite toggling (no backend call, no persistence)
     const MAX_FAVORITES = 20;
     const newFavorites = new Set(favorites);
     if (newFavorites.has(id)) {
       newFavorites.delete(id);
-      try { await FavoriteApi.removeFavorite(id); } catch (_) {}
+      if (accessToken) { try { await FavoriteApi.removeFavorite(id); } catch (_) {} }
     } else {
       if (newFavorites.size >= MAX_FAVORITES) {
         try { showToast(`Bạn chỉ có thể lưu tối đa ${MAX_FAVORITES} phòng yêu thích.`, 'warning'); } catch (_) {}
         return;
       }
       newFavorites.add(id);
-      try { await FavoriteApi.addFavorite(id); } catch (_) {}
+      if (accessToken) { try { await FavoriteApi.addFavorite(id); } catch (_) {} }
     }
     setFavorites(newFavorites);
-    localStorage.setItem('favoriteRoomIds', JSON.stringify([...newFavorites]));
     window.dispatchEvent(new Event('favoritesUpdated'));
   };
 

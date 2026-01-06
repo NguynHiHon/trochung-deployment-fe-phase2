@@ -104,19 +104,37 @@ export const fetchAllRooms = async () => {
 };
 
 // Fetch rooms with server-side pagination and filters
-export const fetchRooms = async ({ page = 1, limit = 12, search = '', minPrice, maxPrice, minArea, maxArea, city, district, types, sort } = {}) => {
+export const fetchRooms = async ({ page = 1, limit = 12, search = '', searchType, minPrice, maxPrice, minArea, maxArea, city, district, ward, types, utilities, sort, postType, textSearchAI } = {}) => {
     const params = { page, limit };
     if (search) params.search = search;
+    if (searchType) params.searchType = searchType;
     if (minPrice !== undefined) params.minPrice = minPrice;
     if (maxPrice !== undefined) params.maxPrice = maxPrice;
     if (minArea !== undefined) params.minArea = minArea;
     if (maxArea !== undefined) params.maxArea = maxArea;
     if (city) params.city = city;
     if (district) params.district = district;
+    if (ward) params.ward = ward;
     if (types) params.types = Array.isArray(types) ? types.join(',') : types;
+    if (utilities) params.utilities = Array.isArray(utilities) ? utilities.join(',') : utilities;
     if (sort) params.sort = sort;
+    if (postType) params.postType = postType;
+    if (textSearchAI) params.textSearchAI = textSearchAI;
+
+    console.log('📡 [FRONTEND API] fetchRooms API call with params:', params);
+    console.log('📡 [FRONTEND API] postType value:', postType, 'type:', typeof postType);
+    console.log('📡 [FRONTEND API] utilities value:', utilities, 'type:', typeof utilities);
+    console.log('📡 [FRONTEND API] textSearchAI value:', textSearchAI);
+
     try {
         const res = await axios.get('/api/posts/rooms', { params });
+        console.log('📡 [FRONTEND API] Response:', res.data?.success, 'rooms count:', res.data?.rooms?.length);
+        if (res.data?.aiMessage) {
+            console.log('🤖 [FRONTEND API] AI Message:', res.data.aiMessage);
+        }
+        if (res.data?.aiStats) {
+            console.log('🤖 [FRONTEND API] AI Stats:', res.data.aiStats);
+        }
         return res.data || { success: false, rooms: [], total: 0 };
     } catch (error) {
         console.error('fetchRooms error:', error);

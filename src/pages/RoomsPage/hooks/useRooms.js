@@ -3,15 +3,18 @@ import { useSearchParams } from 'react-router-dom';
 import { fetchRooms } from '../../../services/api/postApi';
 import { DEFAULT_PAGE_SIZE } from '../constants/filterOptions';
 
-export const useRooms = (sort) => {
+export const useRooms = (sort, postType = 'room_rental', showToast) => {
     const [rooms, setRooms] = useState([]);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
     const [searchParams, setSearchParams] = useSearchParams();
 
+    console.log('🔄 [useRooms] Hook initialized with postType:', postType);
+
     useEffect(() => {
         const loadPage = async () => {
             try {
+                console.log('🔄 [useRooms] useEffect triggered, postType:', postType);
                 const pageParam = parseInt(searchParams.get('page')) || 1;
                 const limitParam = parseInt(searchParams.get('limit')) || DEFAULT_PAGE_SIZE;
                 const searchQ = searchParams.get('search') || '';
@@ -24,7 +27,17 @@ export const useRooms = (sort) => {
                 const district = searchParams.get('district');
                 const ward = searchParams.get('ward');
                 const types = searchParams.get('types');
+                const utilities = searchParams.get('utilities');
                 const sortQ = searchParams.get('sort') || sort;
+                // KHÔNG đọc textSearchAI từ URL params nữa
+
+                console.log('🚀 [FRONTEND] useRooms calling fetchRooms with utilities:', utilities);
+                console.log('🚀 [FRONTEND] Full search params:', {
+                    page: pageParam,
+                    utilities,
+                    types,
+                    search: searchQ
+                });
 
                 const res = await fetchRooms({
                     page: pageParam,
@@ -39,13 +52,27 @@ export const useRooms = (sort) => {
                     district,
                     ward,
                     types,
-                    sort: sortQ
+                    utilities,
+                    sort: sortQ,
+                    postType
+                    // KHÔNG gửi textSearchAI ở đây
                 });
 
                 if (res && res.success) {
                     setRooms(Array.isArray(res.rooms) ? res.rooms : []);
                     setTotal(Number(res.total) || 0);
                     setPage(pageParam);
+
+                    // Xử lý AI message nếu có (chỉ khi có lỗi từ backend)
+                    if (res.aiMessage) {
+                        console.log('🤖 [FRONTEND] AI Message:', res.aiMessage);
+                        if (showToast) {
+                            showToast(res.aiMessage, 'warning');
+                        }
+                    }
+                    if (res.aiStats) {
+                        console.log('🤖 [FRONTEND] AI Stats:', res.aiStats);
+                    }
                 } else {
                     setRooms([]);
                     setTotal(0);
@@ -57,7 +84,7 @@ export const useRooms = (sort) => {
             }
         };
         loadPage();
-    }, [searchParams, sort]);
+    }, [searchParams, sort, postType]);
 
     return {
         rooms,
@@ -65,6 +92,8 @@ export const useRooms = (sort) => {
         page,
         setPage,
         searchParams,
-        setSearchParams
+        setSearchParams,
+        setRooms, // Export để RoomsPage có thể update trực tiếp
+        setTotal  // Export để RoomsPage có thể update trực tiếp
     };
 };

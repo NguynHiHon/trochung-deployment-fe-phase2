@@ -46,6 +46,8 @@ const PostEdit = () => {
     priceFrom: "",
     priceTo: "",
     area: "",
+    beds: 0,
+    baths: 0,
     province: "",
     district: "",
     ward: "",
@@ -109,6 +111,8 @@ const PostEdit = () => {
           category: p.category || mapRoomTypeToCategory(p.room?.roomType) || prev.category,
           priceFrom: (p.priceFrom ?? (p.room?.price)) || prev.priceFrom,
           area: (p.area ?? (p.room?.area)) || prev.area,
+          beds: (p.room?.beds ?? 0),
+          baths: (p.room?.baths ?? 0),
         }));
 
         // location
@@ -335,6 +339,8 @@ const PostEdit = () => {
         room: {
           price: Number(filters.priceFrom) || (post?.room?.price || 0),
           area: Number(filters.area) || (post?.room?.area || 0),
+          beds: Number(filters.beds) || 0,
+          baths: Number(filters.baths) || 0,
           roomType: filters.category || post?.room?.roomType || '',
           district: nameLocation.districtName || post?.room?.district || '',
           province: nameLocation.provinceName || post?.room?.province || '',
@@ -434,7 +440,7 @@ const PostEdit = () => {
             </Box>
           </Grid>
 
-          <BasicInfoSection selectedCategory={filters.category} setSelectedCategory={(v) => handleFilterChange('category', v)} selectedPrice={filters.priceFrom} setSelectedPrice={(v) => handleFilterChange('priceFrom', v)} selectedArea={filters.area} setSelectedArea={(v) => handleFilterChange('area', v)} />
+          <BasicInfoSection selectedCategory={filters.category} setSelectedCategory={(v) => handleFilterChange('category', v)} selectedPrice={filters.priceFrom} setSelectedPrice={(v) => handleFilterChange('priceFrom', v)} selectedArea={filters.area} setSelectedArea={(v) => handleFilterChange('area', v)} selectedBeds={filters.beds} setSelectedBeds={(v) => handleFilterChange('beds', v)} selectedBaths={filters.baths} setSelectedBaths={(v) => handleFilterChange('baths', v)} />
 
           <SelectLocation selectedProvince={selectedProvince} setSelectedProvince={setSelectedProvince} selectedDistrict={selectedDistrict} setSelectedDistrict={setSelectedDistrict} selectedWard={selectedWard} setSelectedWard={setSelectedWard} address={address} setAddress={setAddress} setNameLocation={setNameLocation} nameLocation={nameLocation} />
 

@@ -6,7 +6,7 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
     const { login } = useSelector((state) => state.auth);
     const { currentUser, accessToken } = login;
 
-    if (!currentUser || !accessToken) {
+    if (!currentUser ) {
         return <Navigate to="/login" replace />;
     }
 

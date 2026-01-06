@@ -7,9 +7,10 @@ import {
   MenuItem,
   IconButton,
   Box,
-  Avatar
+  Avatar,
+  colors
 } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Home,
@@ -22,6 +23,7 @@ import {
   Menu as MenuIcon
 } from '@mui/icons-material';
 import { logoutUser } from '../../services/api/authApi';
+import { FavoriteApi } from '../../services/api';
 import theme from '../../theme/theme';
 import MenuMobile from '../Dashboard/MenuMobile';
 
@@ -32,6 +34,7 @@ const NavBar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [favCount, setFavCount] = useState(0);
+  const location = useLocation();
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -55,22 +58,25 @@ const NavBar = () => {
   };
 
   useEffect(() => {
-    const readFav = () => {
+    const readFav = async () => {
       try {
-        const raw = localStorage.getItem('favoriteRoomIds') || '[]';
-        const arr = JSON.parse(raw);
-        setFavCount(Array.isArray(arr) ? arr.length : 0);
-      } catch (_) {
+        if (user) {
+          const res = await FavoriteApi.getMyFavorites();
+          const ids = (res?.favorites || []).map(f => String(f.room?._id || f.clientRoomId || f.room));
+          setFavCount(ids.length);
+        } else {
+          // anonymous users keep favorites in-memory only; show 0 here
+          setFavCount(0);
+        }
+      } catch (err) {
+        console.error('Error reading favorites for NavBar:', err);
         setFavCount(0);
       }
     };
     readFav();
-    const onStorage = () => readFav();
     const onFavUpdate = () => readFav();
-    window.addEventListener('storage', onStorage);
     window.addEventListener('favoritesUpdated', onFavUpdate);
     return () => {
-      window.removeEventListener('storage', onStorage);
       window.removeEventListener('favoritesUpdated', onFavUpdate);
     };
   }, []);
@@ -79,19 +85,16 @@ const NavBar = () => {
   return (
     <AppBar
       position="sticky"
-      elevation={2}
+      elevation={0}
       sx={{
-        //'#1e88e5',
-        bgcolor: theme.palette.primary.main,
-        borderRadius: 0,
-        '& .MuiToolbar-root': {
-          borderRadius: 0,
-        },
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        height: 70,
+        background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(118, 75, 162, 0.03) 100%)',
+        backdropFilter: 'blur(10px)',
+        borderBottom: '1px solid rgba(102, 126, 234, 0.1)',
+        boxShadow: '0 4px 16px rgba(102, 126, 234, 0.08)',
+        height: 75,
       }}
     >
-      <Toolbar sx={{ justifyContent: 'space-between' }}>
+      <Toolbar sx={{ justifyContent: 'space-between', height: '100%', px: { xs: 2, md: 3, lg: 4 } }}>
         {/* Mobile Menu Button - Show on screens < 1000px */}
         <IconButton
           color="inherit"
@@ -101,75 +104,121 @@ const NavBar = () => {
             mr: 2
           }}
         >
-          <MenuIcon />
+          <MenuIcon sx={{ color: "primary.main" }} />
         </IconButton>
 
         {/* Logo */}
-        <Link to="/" style={{ textDecoration: 'none' }}>
+        <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
           <Box
-            component="img"
-            src="/Logomautrang.png"
-            alt="Logo"
             sx={{
-              height: 100,
-              display: 'block',
-              objectFit: 'contain',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              borderRadius: 3,
+              px: 3,
+              py: 1.2,
+              display: 'flex',
+              alignItems: 'center',
+              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.25), 0 2px 4px rgba(102, 126, 234, 0.15)',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: '0 6px 16px rgba(102, 126, 234, 0.35), 0 3px 6px rgba(102, 126, 234, 0.2)',
+              }
             }}
-          />
+          >
+            <Box
+              component="img"
+              src="/Logomautrang.png"
+              alt="Logo"
+              sx={{
+                height: 44,
+                width: 'auto',
+                display: 'block',
+                objectFit: 'contain',
+              }}
+            />
+          </Box>
         </Link>
 
 
         {/* Navigation Menu - Hide on screens < 1000px */}
-        <Box sx={{ display: { xs: 'none', lg: 'flex' }, gap: 2 }}>
+        <Box sx={{ display: { xs: 'none', lg: 'flex' }, gap: 1, alignItems: 'center' }}>
           <Button
             color="inherit"
             component={Link}
             to="/"
+            startIcon={<Home sx={{ fontSize: 20 }} />}
             sx={{
-              color: 'white',
+              color: location.pathname === '/' ? '#764ba2' : '#667eea',
               textTransform: 'none',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 0.8,
-              minWidth: 'auto',
-              px: 3,
-              py: 1.5,
-              borderRadius: 2,
+              fontWeight: location.pathname === '/' ? 700 : 600,
+              fontSize: '0.95rem',
+              px: 2.5,
+              py: 1.2,
+              borderRadius: 2.5,
+              position: 'relative',
+              transition: 'all 0.3s ease',
+              bgcolor: location.pathname === '/' ? 'rgba(118, 75, 162, 0.08)' : 'transparent',
               '&:hover': {
-                bgcolor: 'rgba(255,255,255,0.1)',
+                bgcolor: 'rgba(102, 126, 234, 0.1)',
                 transform: 'translateY(-2px)',
-                transition: 'all 0.3s ease'
+              },
+              '&:after': {
+                content: '""',
+                position: 'absolute',
+                bottom: 8,
+                left: '50%',
+                transform: location.pathname === '/' ? 'translateX(-50%) scaleX(1)' : 'translateX(-50%) scaleX(0)',
+                width: '70%',
+                height: 2,
+                background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                borderRadius: 1,
+                transition: 'transform 0.3s ease',
+              },
+              '&:hover:after': {
+                transform: 'translateX(-50%) scaleX(1)',
               }
             }}
           >
-            <Home sx={{ fontSize: 22 }} />
-            Trang chủ
+            Trang chủ 
           </Button>
 
           <Button
             color="inherit"
             component={Link}
             to="/rooms"
+            startIcon={<HomeWork sx={{ fontSize: 20 }} />}
             sx={{
-              color: 'white',
+              color: location.pathname === '/rooms' ? '#764ba2' : '#667eea',
               textTransform: 'none',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 0.8,
-              minWidth: 'auto',
-              px: 3,
-              py: 1.5,
-              borderRadius: 2,
+              fontWeight: location.pathname === '/rooms' ? 700 : 600,
+              fontSize: '0.95rem',
+              px: 2.5,
+              py: 1.2,
+              borderRadius: 2.5,
+              position: 'relative',
+              transition: 'all 0.3s ease',
+              bgcolor: location.pathname === '/rooms' ? 'rgba(118, 75, 162, 0.08)' : 'transparent',
               '&:hover': {
-                bgcolor: 'rgba(255,255,255,0.1)',
+                bgcolor: 'rgba(102, 126, 234, 0.1)',
                 transform: 'translateY(-2px)',
-                transition: 'all 0.3s ease'
+              },
+              '&:after': {
+                content: '""',
+                position: 'absolute',
+                bottom: 8,
+                left: '50%',
+                transform: location.pathname === '/rooms' ? 'translateX(-50%) scaleX(1)' : 'translateX(-50%) scaleX(0)',
+                width: '70%',
+                height: 2,
+                background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                borderRadius: 1,
+                transition: 'transform 0.3s ease',
+              },
+              '&:hover:after': {
+                transform: 'translateX(-50%) scaleX(1)',
               }
             }}
           >
-            <HomeWork sx={{ fontSize: 22 }} />
             Nhà trọ
           </Button>
 
@@ -178,25 +227,39 @@ const NavBar = () => {
             color="inherit" 
             component={Link} 
             to="/invite-rooms"
+            startIcon={<People sx={{ fontSize: 20 }} />}
             sx={{ 
-              color: 'white', 
+              color: location.pathname === '/invite-rooms' ? '#764ba2' : '#667eea',
               textTransform: 'none',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 0.8,
-              minWidth: 'auto',
-              px: 3,
-              py: 1.5,
-              borderRadius: 2,
+              fontWeight: location.pathname === '/invite-rooms' ? 700 : 600,
+              fontSize: '0.95rem',
+              px: 2.5,
+              py: 1.2,
+              borderRadius: 2.5,
+              position: 'relative',
+              transition: 'all 0.3s ease',
+              bgcolor: location.pathname === '/invite-rooms' ? 'rgba(118, 75, 162, 0.08)' : 'transparent',
               '&:hover': {
-                bgcolor: 'rgba(255,255,255,0.1)',
+                bgcolor: 'rgba(102, 126, 234, 0.1)',
                 transform: 'translateY(-2px)',
-                transition: 'all 0.3s ease'
+              },
+              '&:after': {
+                content: '""',
+                position: 'absolute',
+                bottom: 8,
+                left: '50%',
+                transform: location.pathname === '/invite-rooms' ? 'translateX(-50%) scaleX(1)' : 'translateX(-50%) scaleX(0)',
+                width: '70%',
+                height: 2,
+                background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                borderRadius: 1,
+                transition: 'transform 0.3s ease',
+              },
+              '&:hover:after': {
+                transform: 'translateX(-50%) scaleX(1)',
               }
             }}
           >
-            <People sx={{ fontSize: 22 }} />
             Tìm ở ghép
           </Button>
 
@@ -204,25 +267,39 @@ const NavBar = () => {
             color="inherit"
             component={Link}
             to="/forum"
+            startIcon={<Forum sx={{ fontSize: 20 }} />}
             sx={{
-              color: 'white',
+              color: location.pathname === '/forum' ? '#764ba2' : '#667eea',
               textTransform: 'none',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 0.8,
-              minWidth: 'auto',
-              px: 3,
-              py: 1.5,
-              borderRadius: 2,
+              fontWeight: location.pathname === '/forum' ? 700 : 600,
+              fontSize: '0.95rem',
+              px: 2.5,
+              py: 1.2,
+              borderRadius: 2.5,
+              position: 'relative',
+              transition: 'all 0.3s ease',
+              bgcolor: location.pathname === '/forum' ? 'rgba(118, 75, 162, 0.08)' : 'transparent',
               '&:hover': {
-                bgcolor: 'rgba(255,255,255,0.1)',
+                bgcolor: 'rgba(102, 126, 234, 0.1)',
                 transform: 'translateY(-2px)',
-                transition: 'all 0.3s ease'
+              },
+              '&:after': {
+                content: '""',
+                position: 'absolute',
+                bottom: 8,
+                left: '50%',
+                transform: location.pathname === '/forum' ? 'translateX(-50%) scaleX(1)' : 'translateX(-50%) scaleX(0)',
+                width: '70%',
+                height: 2,
+                background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                borderRadius: 1,
+                transition: 'transform 0.3s ease',
+              },
+              '&:hover:after': {
+                transform: 'translateX(-50%) scaleX(1)',
               }
             }}
           >
-            <Forum sx={{ fontSize: 22 }} />
             Diễn đàn
           </Button>
 
@@ -230,25 +307,39 @@ const NavBar = () => {
             color="inherit"
             component={Link}
             to="/about"
+            startIcon={<HelpOutline sx={{ fontSize: 20 }} />}
             sx={{
-              color: 'white',
+              color: location.pathname === '/about' ? '#764ba2' : '#667eea',
               textTransform: 'none',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 0.8,
-              minWidth: 'auto',
-              px: 3,
-              py: 1.5,
-              borderRadius: 2,
+              fontWeight: location.pathname === '/about' ? 700 : 600,
+              fontSize: '0.95rem',
+              px: 2.5,
+              py: 1.2,
+              borderRadius: 2.5,
+              position: 'relative',
+              transition: 'all 0.3s ease',
+              bgcolor: location.pathname === '/about' ? 'rgba(118, 75, 162, 0.08)' : 'transparent',
               '&:hover': {
-                bgcolor: 'rgba(255,255,255,0.1)',
+                bgcolor: 'rgba(102, 126, 234, 0.1)',
                 transform: 'translateY(-2px)',
-                transition: 'all 0.3s ease'
+              },
+              '&:after': {
+                content: '""',
+                position: 'absolute',
+                bottom: 8,
+                left: '50%',
+                transform: location.pathname === '/about' ? 'translateX(-50%) scaleX(1)' : 'translateX(-50%) scaleX(0)',
+                width: '70%',
+                height: 2,
+                background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                borderRadius: 1,
+                transition: 'transform 0.3s ease',
+              },
+              '&:hover:after': {
+                transform: 'translateX(-50%) scaleX(1)',
               }
             }}
           >
-            <HelpOutline sx={{ fontSize: 22 }} />
             About
           </Button>
 
@@ -256,25 +347,39 @@ const NavBar = () => {
             color="inherit"
             component={Link}
             to="/blog"
+            startIcon={<MenuBook sx={{ fontSize: 20 }} />}
             sx={{
-              color: 'white',
+              color: location.pathname === '/blog' ? '#764ba2' : '#667eea',
               textTransform: 'none',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 0.8,
-              minWidth: 'auto',
-              px: 3,
-              py: 1.5,
-              borderRadius: 2,
+              fontWeight: location.pathname === '/blog' ? 700 : 600,
+              fontSize: '0.95rem',
+              px: 2.5,
+              py: 1.2,
+              borderRadius: 2.5,
+              position: 'relative',
+              transition: 'all 0.3s ease',
+              bgcolor: location.pathname === '/blog' ? 'rgba(118, 75, 162, 0.08)' : 'transparent',
               '&:hover': {
-                bgcolor: 'rgba(255,255,255,0.1)',
+                bgcolor: 'rgba(102, 126, 234, 0.1)',
                 transform: 'translateY(-2px)',
-                transition: 'all 0.3s ease'
+              },
+              '&:after': {
+                content: '""',
+                position: 'absolute',
+                bottom: 8,
+                left: '50%',
+                transform: location.pathname === '/blog' ? 'translateX(-50%) scaleX(1)' : 'translateX(-50%) scaleX(0)',
+                width: '70%',
+                height: 2,
+                background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                borderRadius: 1,
+                transition: 'transform 0.3s ease',
+              },
+              '&:hover:after': {
+                transform: 'translateX(-50%) scaleX(1)',
               }
             }}
           >
-            <MenuBook sx={{ fontSize: 22 }} />
             Blog
           </Button>
         </Box>
@@ -290,10 +395,21 @@ const NavBar = () => {
                
                 startIcon={<ManageAccounts />}
                 sx={{
-                  bgcolor: 'rgba(255,255,255,0.2)',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                   color: 'white',
                   textTransform: 'none',
-                  '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }
+                  fontWeight: 700,
+                  fontSize: '0.95rem',
+                  px: 3,
+                  py: 1,
+                  borderRadius: 2.5,
+                  boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': { 
+                    background: 'linear-gradient(135deg, #5568d3 0%, #5e3c82 100%)',
+                    boxShadow: '0 6px 16px rgba(102, 126, 234, 0.4)',
+                    transform: 'translateY(-2px)',
+                  }
                 }}
               >
                 {user?.role === 'admin' ? 'Admin' : 'Quản lý'}
@@ -302,10 +418,24 @@ const NavBar = () => {
               <IconButton
                 size="large"
                 onClick={handleMenu}
-                sx={{ p: 0 }}
+                sx={{ 
+                  p: 0,
+                  transition: 'transform 0.3s ease',
+                  '&:hover': {
+                    transform: 'scale(1.1)',
+                  }
+                }}
               >
                 <Avatar
-                  sx={{ bgcolor: '#f39c12', width: 40, height: 40 }}
+                  sx={{ 
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
+                    width: 40, 
+                    height: 40,
+                    fontWeight: 700,
+                    boxShadow: '0 3px 8px rgba(102, 126, 234, 0.3)',
+                    border: '2px solid rgba(255, 255, 255, 0.8)',
+                  }}
                   alt={user.username}
                 >
                   {user.username?.charAt(0).toUpperCase()}
@@ -318,14 +448,9 @@ const NavBar = () => {
                 onClose={handleClose}
               >
                 {user?.role === 'admin' && (
-                  <>
-                    <MenuItem onClick={handleClose} component={Link} to="/admin/confirm-payment">
-                      Xác nhận thanh toán
-                    </MenuItem>
-                    <MenuItem onClick={handleClose} component={Link} to="/admin/viewsupport">
-                      Quản lý tin hỗ trợ
-                    </MenuItem>
-                  </>
+                  <MenuItem onClick={handleClose} component={Link} to="/admin">
+                    Quản trị (Admin Panel)
+                  </MenuItem>
                 )}
                 <MenuItem onClick={handleClose} component={Link} to="/user/profile">
                   Thông tin cá nhân
@@ -343,30 +468,52 @@ const NavBar = () => {
             </>
           ) : (
             <>
-              <Button
-                variant="contained"
-                component={Link}
-                to="/manage"
-                startIcon={<ManageAccounts />}
+            
+
+              <Button 
+                color="inherit" 
+                component={Link} 
+                to="/login"
                 sx={{
-                  bgcolor: 'rgba(255,255,255,0.2)',
-                  color: 'white',
+                  color: '#667eea',
                   textTransform: 'none',
-                  '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }
+                  fontWeight: 600,
+                  fontSize: '0.95rem',
+                  px: 2.5,
+                  py: 1,
+                  borderRadius: 2.5,
+                  border: '1.5px solid rgba(102, 126, 234, 0.3)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    bgcolor: 'rgba(102, 126, 234, 0.1)',
+                    borderColor: '#667eea',
+                    transform: 'translateY(-2px)',
+                  }
                 }}
               >
-                Quản lý
-              </Button>
-
-              <Button color="inherit" component={Link} to="/login">
                 Đăng nhập
               </Button>
               <Button
-                variant="outlined"
-                color="inherit"
+                variant="contained"
                 component={Link}
                 to="/register"
-                sx={{ borderColor: 'white', '&:hover': { borderColor: 'grey.300' } }}
+                sx={{ 
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  fontSize: '0.95rem',
+                  px: 3,
+                  py: 1,
+                  borderRadius: 2.5,
+                  boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': { 
+                    background: 'linear-gradient(135deg, #5568d3 0%, #5e3c82 100%)',
+                    boxShadow: '0 6px 16px rgba(102, 126, 234, 0.4)',
+                    transform: 'translateY(-2px)',
+                  }
+                }}
               >
                 Đăng ký
               </Button>

@@ -77,11 +77,11 @@ const LocationFilter = ({
         <MenuItem
           onClick={() => {
             setSelectedProvince('');
-            setSelectedProvinceCode('');
+            if (setSelectedProvinceCode) setSelectedProvinceCode('');
             setSelectedDistrict('');
-            setSelectedDistrictCode('');
+            if (setSelectedDistrictCode) setSelectedDistrictCode('');
             setSelectedWard('');
-            setSelectedWardCode('');
+            if (setSelectedWardCode) setSelectedWardCode('');
             setProvinceEl(null);
           }}
         >
@@ -91,7 +91,11 @@ const LocationFilter = ({
           <MenuItem
             key={province.code}
             onClick={() => {
-              handleProvinceSelect(province.code, province.name, isFromDialog);
+              if (handleProvinceSelect) {
+                handleProvinceSelect(province.code, province.name, isFromDialog);
+              } else {
+                setSelectedProvince(province.name);
+              }
               setProvinceEl(null);
             }}
             selected={selectedProvinceCode === province.code}
@@ -106,9 +110,9 @@ const LocationFilter = ({
         <MenuItem
           onClick={() => {
             setSelectedDistrict('');
-            setSelectedDistrictCode('');
+            if (setSelectedDistrictCode) setSelectedDistrictCode('');
             setSelectedWard('');
-            setSelectedWardCode('');
+            if (setSelectedWardCode) setSelectedWardCode('');
             setDistrictEl(null);
           }}
         >
@@ -118,7 +122,11 @@ const LocationFilter = ({
           <MenuItem
             key={district.code}
             onClick={() => {
-              handleDistrictSelect(district.code, district.name, isFromDialog);
+              if (handleDistrictSelect) {
+                handleDistrictSelect(district.code, district.name, isFromDialog);
+              } else {
+                setSelectedDistrict(district.name);
+              }
               setDistrictEl(null);
             }}
             selected={selectedDistrictCode === district.code}
@@ -133,7 +141,7 @@ const LocationFilter = ({
         <MenuItem
           onClick={() => {
             setSelectedWard('');
-            setSelectedWardCode('');
+            if (setSelectedWardCode) setSelectedWardCode('');
             setWardEl(null);
           }}
         >
@@ -143,7 +151,11 @@ const LocationFilter = ({
           <MenuItem
             key={ward.code}
             onClick={() => {
-              handleWardSelect(ward.code, ward.name, isFromDialog);
+              if (handleWardSelect) {
+                handleWardSelect(ward.code, ward.name, isFromDialog);
+              } else {
+                setSelectedWard(ward.name);
+              }
               setWardEl(null);
             }}
             selected={selectedWardCode === ward.code}

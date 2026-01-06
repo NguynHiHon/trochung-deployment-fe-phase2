@@ -13,25 +13,25 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: '#3591C4', // Closest Web Safe - màu chủ đạo
-      light: '#5c5c8a',
-      dark: '#262647',
+      main: '#667eea', // Purple gradient start
+      light: '#8b9aff',
+      dark: '#5568d3',
       contrastText: '#ffffff',
     },
     secondary: {
-      main: '#3591C4', // Closest Pantone® - màu phụ xanh dương
-      light: '#66a8d1',
-      dark: '#266a94',
+      main: '#764ba2', // Purple gradient end
+      light: '#9568c4',
+      dark: '#5e3c82',
       contrastText: '#ffffff',
     },
     tertiary: {
-      main: '#5002', // Closest RAL [Ultramarine blue] - màu thứ 3
-      light: '#7d35',
-      dark: '#3501',
-      contrastText: '#ffffff',
+      main: '#f5f7fa',
+      light: '#ffffff',
+      dark: '#e1e4e8',
+      contrastText: '#1a202c',
     },
     background: {
-      default: '#f8fafc',
+      default: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       paper: '#ffffff',
     },
   },
@@ -78,40 +78,40 @@ const theme = createTheme({
   },
 });
 
-// Extend theme với tertiary color - màu cam-đỏ đẹp hơn
+// Extend theme với tertiary color - Facebook Gray
 theme.palette.tertiary = theme.palette.augmentColor({
   color: {
-    main: '#ff6b6b', // Coral red - màu cam-đỏ nhẹ nhàng
-    light: '#ff9999',
-    dark: '#e55555',
+    main: '#E4E6EB', // Facebook Gray
+    light: '#F0F2F5',
+    dark: '#BCC0C4',
   },
   name: 'tertiary',
 });
 
-// Extend theme với sidebar colors - quản lý màu sidebar
+// Extend theme với sidebar colors - Purple gradient
 theme.palette.sidebar = {
-  main: '#404080', // Lighter purple-blue cho sidebar top
-  dark: '#333366', // Deep purple-blue cho sidebar bottom (giống primary)
-  gradient: 'linear-gradient(180deg, #404080 0%, #333366 100%)',
-  shadow: 'rgba(64, 64, 128, 0.15)',
+  main: '#667eea',
+  dark: '#5568d3',
+  gradient: 'linear-gradient(180deg, #667eea 0%, #764ba2 100%)',
+  shadow: 'rgba(102, 126, 234, 0.15)',
 };
 
-// Extend theme với form section colors - quản lý màu form sections
+// Extend theme với form section colors - Purple gradient
 theme.palette.formSections = {
   interests: {
-    background: 'rgba(53, 145, 196, 0.05)', // Secondary với opacity
-    shadow: 'rgba(53, 145, 196, 0.1)',
-    shadowHover: 'rgba(53, 145, 196, 0.15)',
+    background: 'rgba(102, 126, 234, 0.05)',
+    shadow: 'rgba(102, 126, 234, 0.1)',
+    shadowHover: 'rgba(102, 126, 234, 0.15)',
   },
   habits: {
-    background: 'rgba(51, 51, 102, 0.05)', // Primary với opacity
-    shadow: 'rgba(51, 51, 102, 0.1)',
-    shadowHover: 'rgba(51, 51, 102, 0.15)',
+    background: 'rgba(118, 75, 162, 0.05)',
+    shadow: 'rgba(118, 75, 162, 0.1)',
+    shadowHover: 'rgba(118, 75, 162, 0.15)',
   },
   dislikes: {
-    background: 'rgba(255, 107, 107, 0.05)', // Tertiary với opacity
-    shadow: 'rgba(255, 107, 107, 0.1)',
-    shadowHover: 'rgba(255, 107, 107, 0.15)',
+    background: 'rgba(139, 154, 255, 0.05)',
+    shadow: 'rgba(139, 154, 255, 0.1)',
+    shadowHover: 'rgba(139, 154, 255, 0.15)',
   },
 };
 

@@ -48,26 +48,25 @@ const FavoritesPage = () => {
         const ids = (res?.favorites || []).map(f => String(f.room?._id || f.clientRoomId || f.room));
         console.log('🆔 Extracted favorite IDs:', ids);
         setFavIds(ids);
-        localStorage.setItem('favoriteRoomIds', JSON.stringify(ids));
       } catch (e) {
         console.error('❌ Error loading favorites from API:', e);
-        try {
-          const raw = localStorage.getItem('favoriteRoomIds') || '[]';
-          const localIds = JSON.parse(raw);
-          console.log('💾 Using local storage favorites:', localIds);
-          setFavIds(localIds);
-        } catch (_err) { 
-          console.error('❌ Error parsing local storage:', _err);
-          setFavIds([]); 
-        }
+        // If cannot load from API, fall back to empty list for anonymous users
+        setFavIds([]);
       }
     };
     load();
-    const onFavUpdate = () => {
-      try {
-        const raw = localStorage.getItem('favoriteRoomIds') || '[]';
-        setFavIds(JSON.parse(raw));
-      } catch (_) {}
+    const onFavUpdate = async () => {
+      if (accessToken) {
+        try {
+          const res = await FavoriteApi.getMyFavorites();
+          const ids = (res?.favorites || []).map(f => String(f.room?._id || f.clientRoomId || f.room));
+          setFavIds(ids);
+        } catch (err) {
+          console.error('Error refreshing favorites after update:', err);
+        }
+      } else {
+        // anonymous users keep favorites in-memory only; nothing to refresh here
+      }
     };
     window.addEventListener('favoritesUpdated', onFavUpdate);
     return () => window.removeEventListener('favoritesUpdated', onFavUpdate);
@@ -120,20 +119,12 @@ const FavoritesPage = () => {
   const toggleType = (t) => setDraftTypes((prev) => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
 
   const toggleFavorite = async (roomId) => {
-    console.log('❤️ Favorite toggle triggered for room:', roomId);
-    console.log('🔐 Access token:', accessToken ? 'EXISTS' : 'MISSING');
-    if (!accessToken) {
-      console.warn('⚠️ No access token, need login');
-      showToast('Vui lòng đăng nhập để yêu thích phòng trọ', 'warning');
-      return;
-    }
-
     setFavIds((prev) => {
       const set = new Set(prev);
       if (set.has(roomId)) {
         console.log('❌ Removing from favorites');
         set.delete(roomId);
-        FavoriteApi.removeFavorite(roomId).catch((e) => console.error('Error removing favorite:', e));
+        if (accessToken) FavoriteApi.removeFavorite(roomId).catch((e) => console.error('Error removing favorite:', e));
       } else {
         if (set.size >= MAX_FAVORITES) { 
           showToast(`Bạn chỉ có thể lưu tối đa ${MAX_FAVORITES} phòng yêu thích.`, 'warning');
@@ -141,10 +132,9 @@ const FavoritesPage = () => {
         }
         console.log('✅ Adding to favorites');
         set.add(roomId);
-        FavoriteApi.addFavorite(roomId).catch((e) => console.error('Error adding favorite:', e));
+        if (accessToken) FavoriteApi.addFavorite(roomId).catch((e) => console.error('Error adding favorite:', e));
       }
       const arr = Array.from(set);
-      localStorage.setItem('favoriteRoomIds', JSON.stringify(arr));
       try { window.dispatchEvent(new Event('favoritesUpdated')); } catch (_) {}
       console.log('💾 Updated favorites:', arr);
       return arr;

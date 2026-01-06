@@ -14,9 +14,11 @@ const RoomList = ({
     handlePageChange
 }) => {
     return (
-        <Box sx={{ minHeight: 'calc(100vh - 400px)', display: 'flex', flexDirection: 'column' }}>
+        <>
+
+          
             {/* Room Cards */}
-            <Stack spacing={2} sx={{ flex: 1 }}>
+            <Stack spacing={2}>
                 {currentItems.map((room) => (
                     <RoomCard
                         key={room.id}
@@ -41,7 +43,7 @@ const RoomList = ({
                     showLastButton
                 />
             </Box>
-        </Box>
+        </>
     );
 };
 

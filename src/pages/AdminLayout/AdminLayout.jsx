@@ -11,11 +11,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 const drawerWidth = 250;
 
 const adminMenu = [
-  {
-    label: 'Xác nhận thanh toán',
-    icon: <MonetizationOnIcon color="primary" />,
-    path: '/admin/confirm-payment',
-  },
+ 
   {
     label: 'Quản lý bài đăng',
     icon: <HomeWorkIcon color="primary" />,

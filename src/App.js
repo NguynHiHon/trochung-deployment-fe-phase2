@@ -1,6 +1,5 @@
 import "./App.css";
 import './config/axios';
-import HomeAdmin from "./pages/AdminLayout/HomeAdmin/HomeAdmin";
 import HomePageUser from "./pages/HomePageUser/HomePageUser";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import LoginPage from "./pages/LoginPage/LoginPage";
@@ -18,11 +17,6 @@ import UserLayout from "./pages/UserLayout/UserLayout";
 
 
 // Pages
-import AdminDashboard from "./pages/AdminLayout/AdminDashboard/AdminDashboard";
-import AdminUsers from "./pages/AdminLayout/AdminUsers/AdminUsers";
-import AdminPosts from "./pages/AdminLayout/AdminPosts/AdminPosts";
-import AdminSupport from "./pages/AdminLayout/AdminSupport/AdminSupport";
-import AdminPayments from './pages/AdminLayout/AdminPayments/AdminPayments';
 import HomeLanding from "./pages/HomeLanding/HomeLanding";
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -48,13 +42,14 @@ import PostEdit from './pages/PostEdit/PostEdit';
 import InviteRooms from './pages/InviteRooms/InviteRooms';
 import InviteDetail from './pages/InviteDetail/InviteDetail';
 import NoPermission from './pages/NoPermission';
+import AboutPage from './pages/AboutPage/AboutPage';
 
 // Component con để sử dụng useLocation hook
 function AppContent() {
   const location = useLocation();
 
   // Định nghĩa các route không hiển thị navbar
-  const hideNavbarRoutes = ['/landlord', '/admin', '/homeadmin', '/register', '/login', '/verify', '/forgot-password', '/reset-password', '/verifycode'];
+  const hideNavbarRoutes = ['/landlord', '/admin', '/register', '/login', '/verify', '/forgot-password', '/reset-password', '/verifycode'];
 
   // Kiểm tra có nên hiển thị navbar không
   const shouldShowNavbar = !hideNavbarRoutes.some(route =>
@@ -66,9 +61,9 @@ function AppContent() {
       {shouldShowNavbar && <NavBar />}
       <Box component="main" sx={{ flex: 1 }}>
         <Routes>
-          <Route path="/homeadmin" element={<HomeAdmin />} />
           <Route path="/homepage" element={<HomePageUser />} />
           <Route path="/" element={<HomeLanding />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/login" element={<LoginPage />} />
           {/* <Route path="/register" element={<RegisterPage />} /> */}
           <Route path="/register" element={<Register />} />
@@ -77,8 +72,8 @@ function AppContent() {
           <Route path="/verifycode" element={<VerifyCode />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/verify" element={<Verify />} />
-          <Route path="/rooms" element={<RoomsPage />} />
-          <Route path="/invite-rooms" element={<InviteRooms />} />
+          <Route path="/rooms" element={<RoomsPage postType="room_rental" />} />
+          <Route path="/invite-rooms" element={<RoomsPage postType="invite roomate" />} />
           <Route path="/invite/:id" element={<InviteDetail />} />
           <Route path="/favorites" element={<FavoritesPage />} />
           <Route path="/room/:id" element={<RoomDetailPage />} />
@@ -91,14 +86,7 @@ function AppContent() {
             <ProtectedRoute requireAdmin={true}>
               <AdminLayout />
             </ProtectedRoute>
-          }>
-            <Route index element={<AdminDashboard />} />
-            <Route path="homeadmin" element={<HomeAdmin />} />
-            <Route path="users" element={<AdminUsers />} />
-            <Route path="posts" element={<AdminPosts />} />
-            <Route path="confirm-payment" element={<AdminPayments />} />
-            <Route path="viewsupport" element={<AdminSupport />} />
-          </Route>
+          } />
 
           {/* User routes */}
 

@@ -27,6 +27,8 @@ const PostRoomPages = () => {
     priceFrom: '',
     priceTo: '',
     area: '',
+    beds: 0,
+    baths: 0,
     province: '',
     district: '',
     ward: '',
@@ -234,6 +236,8 @@ const PostRoomPages = () => {
       priceFrom: filters.priceFrom,
       priceTo: filters.priceTo,
       area: filters.area,
+      beds: filters.beds,
+      baths: filters.baths,
 
       // Địa chỉ (từ SelectLocation component)
       location: {
@@ -282,6 +286,8 @@ const PostRoomPages = () => {
             priceFrom: '',
             priceTo: '',
             area: '',
+            beds: 0,
+            baths: 0,
             province: '',
             district: '',
             ward: '',
@@ -396,6 +402,10 @@ const PostRoomPages = () => {
             setSelectedPrice={(value) => handleFilterChange('priceFrom', value)}
             selectedArea={filters.area}
             setSelectedArea={(value) => handleFilterChange('area', value)}
+            selectedBeds={filters.beds}
+            setSelectedBeds={(value) => handleFilterChange('beds', value)}
+            selectedBaths={filters.baths}
+            setSelectedBaths={(value) => handleFilterChange('baths', value)}
           />
 
           {/* Hàng 3: Khu vực */}
