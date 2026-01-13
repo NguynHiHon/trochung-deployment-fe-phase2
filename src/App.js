@@ -1,5 +1,6 @@
 import "./App.css";
 import './config/axios';
+import HomeAdmin from "./pages/AdminLayout/HomeAdmin/HomeAdmin";
 import HomePageUser from "./pages/HomePageUser/HomePageUser";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import LoginPage from "./pages/LoginPage/LoginPage";
@@ -61,6 +62,7 @@ function AppContent() {
       {shouldShowNavbar && <NavBar />}
       <Box component="main" sx={{ flex: 1 }}>
         <Routes>
+          <Route path="/homeadmin" element={<HomeAdmin />} />
           <Route path="/homepage" element={<HomePageUser />} />
           <Route path="/" element={<HomeLanding />} />
           <Route path="/about" element={<AboutPage />} />

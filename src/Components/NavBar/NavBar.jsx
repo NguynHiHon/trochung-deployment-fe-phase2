@@ -448,9 +448,14 @@ const NavBar = () => {
                 onClose={handleClose}
               >
                 {user?.role === 'admin' && (
-                  <MenuItem onClick={handleClose} component={Link} to="/admin">
-                    Quản trị (Admin Panel)
-                  </MenuItem>
+                  <>
+                    <MenuItem onClick={handleClose} component={Link} to="/admin/confirm-payment">
+                      Xác nhận thanh toán
+                    </MenuItem>
+                    <MenuItem onClick={handleClose} component={Link} to="/admin/viewsupport">
+                      Quản lý tin hỗ trợ
+                    </MenuItem>
+                  </>
                 )}
                 <MenuItem onClick={handleClose} component={Link} to="/user/profile">
                   Thông tin cá nhân
